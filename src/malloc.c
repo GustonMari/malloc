@@ -82,3 +82,32 @@ void    merge(struct block_meta *block)
         current = current->next;
     }
 }
+
+void    free(void *ptr)
+{
+    struct block_meta *current = ptr;
+    current--;
+    current->free = true;
+    merge(current);
+
+
+    // struct block_meta *current;
+    // if (((void *)head <= ptr) && (ptr <= (void *)(head + 1)))
+    // {
+    //     head->free = true;
+    //     merge(head);
+    //     return ;
+    // }
+    // current = head;
+    // while (current->next != NULL)
+    // {
+    //     if (((void *)current->next <= ptr) && (ptr <= (void *)(current->next + 1)))
+    //     {
+    //         current->next->free = true;
+    //         merge(current->next);
+    //         return ;
+    //     }
+    //     current = current->next;
+    // }
+    // return ;
+}
