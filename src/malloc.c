@@ -33,14 +33,32 @@ void *malloc(size_t size)
     // ? First fit algorithm
     current = head;
     //check 
-    while(((current->size < size) || (current->free == false)) && (current->next != NULL))
+    while (((current->size < size) || (current->free == false)) && (current->next != NULL))
     {
         prev = current;
         current = current->next;
         write(1,"Check\n",strlen("Check\n"));
     }
-    
 
+    // if there is a memory chunk that fits perfectly the required size.
+    if ((current->size) == size)
+    {
+        current->free = false;
+        result = (void *)(current + 1);
+        write(1, "Perfect size\n", strlen("Perfect size\n"));
+        return result;
+    }
+    // if there is a memory chunk that fits the required size but it is bigger than the required size.
+    else if ((current->size) > (size + META_SIZE))
+    {
+        split_memory(current, size);
+        result = (void *)(current + 1);
+        write(1, "Split\n", strlen("Split\n"));
+        return result;
+    }
+    else
+    {
+    }
 
 
 
