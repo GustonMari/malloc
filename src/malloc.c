@@ -1,6 +1,6 @@
 #include "../include/memory.h"
 
-void init()
+void    init()
 {
     // Initialize the head of the linked list
     // head = sbrk(0);
@@ -11,7 +11,7 @@ void init()
 }
 
 // ? Making a way for a new block allocation by splitting a free block (assume first fit algorithm)
-void split_memory(struct block_meta *block, size_t size)
+void    split_memory(struct block_meta *block, size_t size)
 {
     // Split the memory into two blocks
     struct block_meta *new_block = (void *)((void *)block + META_SIZE + size);
@@ -23,7 +23,7 @@ void split_memory(struct block_meta *block, size_t size)
     block->free = false;
 }
 
-void *malloc(size_t size)
+void    *malloc(size_t size)
 {
     struct block_meta *prev, *current;
     void *result;
@@ -58,29 +58,27 @@ void *malloc(size_t size)
     }
     else
     {
+        // There can be a situation where you have consecutive blocks that are set free by deallocating after they were previously allocated. 
+        // This results in external fragmentation which will cause the MyMalloc() function to return a NULL pointer although we have enough memory to allocate.
+        result = NULL;
+        write(1, "No memory\n", strlen("No memory\n"));
+        return result;
     }
-
-
-
-    // // Initialize the head of the linked list
-    // if (head->size == 0)
-    //     init();
-    // // ? First fit algorithm
-    // struct block_meta *current = head;
-    // while (current)
-    // {
-    //     if (current->free && current->size >= size)
-    //     {
-    //         // ? Split the memory into two blocks
-    //         if (current->size > size + META_SIZE)
-    //             split_memory(current, size);
-    //         current->free = false;
-    //         return (void *)(current + 1);
-    //     }
-    //     current = current->next;
-    // }
-    // return NULL;
 }
 
-
-
+//? we use a function called merge() to join the consecutive free blocks by removing the metadata blocks lying in between.
+void    merge(struct block_meta *block)
+{
+    struct block_meta *current, *prev;
+    current = head;
+    while (current->next != NULL)
+    {
+        if ((current->free == true) && (current->next->free == true))
+        {
+            current->size += (current->next->size) + META_SIZE;
+            current->next = current->next->next;
+        }
+        prev = current;
+        current = current->next;
+    }
+}
