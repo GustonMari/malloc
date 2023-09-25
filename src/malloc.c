@@ -39,7 +39,7 @@ void    *malloc(size_t size)
         current = current->next;
         write(1,"Check\n",strlen("Check\n"));
     }
-
+	// ! case 3
     // if there is a memory chunk that fits perfectly the required size.
     if ((current->size) == size)
     {
@@ -48,6 +48,7 @@ void    *malloc(size_t size)
         write(1, "Perfect size\n", strlen("Perfect size\n"));
         return result;
     }
+	// ! case 2
     // if there is a memory chunk that fits the required size but it is bigger than the required size.
     else if ((current->size) > (size + META_SIZE))
     {
@@ -58,9 +59,11 @@ void    *malloc(size_t size)
     }
     else
     {
+		// TODO need to make case 1 and 4
         // There can be a situation where you have consecutive blocks that are set free by deallocating after they were previously allocated. 
         // This results in external fragmentation which will cause the MyMalloc() function to return a NULL pointer although we have enough memory to allocate.
         result = NULL;
+		// TODO: we need to go to the furthermost to the right of the heap, then create a new block that is right after the last block.
         write(1, "No memory\n", strlen("No memory\n"));
         return result;
     }

@@ -1,5 +1,5 @@
 # ifndef MEMORY_H
-# define MEMORY_H
+# 	define MEMORY_H
 # endif
 # include <stdlib.h>
 # include <stdio.h>
@@ -7,6 +7,9 @@
 # include <unistd.h>
 # include <string.h>
 # include <stddef.h>
+# include <sys/mman.h>
+# include <sys/time.h>
+# include <sys/resource.h>
 # define META_SIZE sizeof(struct block_meta)
 
 char memory[20000];

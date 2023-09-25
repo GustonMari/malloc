@@ -12,4 +12,6 @@ https://www.quora.com/How-does-malloc-work-internally
 
 https://www.youtube.com/watch?v=sZ8GJ1TiMdk&ab_channel=TsodingDaily
 
+
+https://bowenfeng.tech/projects/dynamic%20memory/2021/10/15/custom-malloc.html
 #### NEED TO MAKE MORE RESEARCH
