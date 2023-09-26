@@ -14,7 +14,7 @@ void    init()
 void    split_memory(struct block_meta *block, size_t size)
 {
     // Split the memory into two blocks
-    struct block_meta *new_block = (void *)((void *)block + META_SIZE + size);
+    block_meta *new_block = (void *)((void *)block + META_SIZE + size);
     new_block->size = block->size - size - META_SIZE;
     new_block->next = block->next;
     new_block->free = true;
@@ -25,7 +25,7 @@ void    split_memory(struct block_meta *block, size_t size)
 
 void    *malloc(size_t size)
 {
-    struct block_meta *prev, *current;
+    block_meta *prev, *current;
     void *result;
     if (head->size == 0)
         init();
@@ -72,7 +72,7 @@ void    *malloc(size_t size)
 //? we use a function called merge() to join the consecutive free blocks by removing the metadata blocks lying in between.
 void    merge(struct block_meta *block)
 {
-    struct block_meta *current, *prev;
+    block_meta *current, *prev;
     current = head;
     while (current->next != NULL)
     {
@@ -88,7 +88,7 @@ void    merge(struct block_meta *block)
 
 void    free(void *ptr)
 {
-    struct block_meta *current = ptr;
+    block_meta *current = ptr;
     current--;
     current->free = true;
     merge(current);
