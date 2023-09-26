@@ -15,6 +15,7 @@ https://www.youtube.com/watch?v=sZ8GJ1TiMdk&ab_channel=TsodingDaily
 
 https://bowenfeng.tech/projects/dynamic%20memory/2021/10/15/custom-malloc.html
 
+VERY REPRESENTATIVE: https://my.eng.utah.edu/~cs4400/malloc.pdf
 VERY USEFULL : https://pages.cs.wisc.edu/~remzi/OSTEP/vm-freespace.pdf
 
 #### NEED TO MAKE MORE RESEARCH
