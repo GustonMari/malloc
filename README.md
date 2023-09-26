@@ -15,7 +15,11 @@ https://www.youtube.com/watch?v=sZ8GJ1TiMdk&ab_channel=TsodingDaily
 
 https://bowenfeng.tech/projects/dynamic%20memory/2021/10/15/custom-malloc.html
 
+
+https://codereview.stackexchange.com/questions/213213/my-malloc-in-c-using-mmap
 VERY REPRESENTATIVE: https://my.eng.utah.edu/~cs4400/malloc.pdf
-VERY USEFULL : https://pages.cs.wisc.edu/~remzi/OSTEP/vm-freespace.pdf
+VERY USEFULL :
+* https://pages.cs.wisc.edu/~remzi/OSTEP/vm-freespace.pdf
+* https://wiki-prog.infoprepa.epita.fr/images/0/04/Malloc_tutorial.pdf
 
 #### NEED TO MAKE MORE RESEARCH
