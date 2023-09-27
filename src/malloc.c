@@ -1,32 +1,58 @@
 #include "../include/memory.h"
 
+// Divided in 3 types of chuncks aka TINY, SMALL, LARGE
 chunck_memory *head[3] = {NULL, NULL, NULL};
-// bool start = true;
 
-// void init_chunk_memory()
-// {
-//     for (int i = 0; i < 3; i++)
-//     {
-//         // head[i] = mmap(NULL, CHUNK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-//         head[i]->size = 0;
-//         head[i]->head = NULL;
-//         head[i]->next = NULL;
-//         head[i]->free = true;
-//     }
-// }
+int     define_index(size_t size)
+{
+    if (size <= TINY)
+        return 0;
+    else if (size > TINY && size <= SMALL)
+        return 1;
+    else if (size > SMALL)
+        return 2;
+    return -1;
+}
+
+void    *push_back(size_t size, int index)
+{
+    chunck_memory *tmp = head[index];
+    chunck_memory *new = NULL;
+
+    if (tmp == NULL)
+    {
+        printf("1");
+        head[index] = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        head[index]->size = 0;
+        head[index]->head = NULL;
+        head[index]->next = NULL;
+        head[index]->free = true;
+        return head[index];
+    }
+    while (tmp->next != NULL)
+    {
+
+        printf("2");
+        tmp = tmp->next;
+    }
+    new = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    new->size = 0;
+    new->head = NULL;
+    new->next = NULL;
+    new->free = true;
+    tmp->next = new;
+    return new;
+}
 
 // @return -1 if the head is not empty or return the good category of chunk size
-int   head_is_empty(size)
+int     head_is_empty(size)
 {
-    // if (head == NULL)
-    // {
-        if (size <= TINY && head[0] == NULL)
-            return (TINY);
-        else if (size > TINY && size <= SMALL && head[1] == NULL)
-            return (SMALL);
-        else if (size > SMALL && head[2] == NULL)
-            return (LARGE);
-    // }
+    if (size <= TINY && head[0] == NULL)
+        return (TINY);
+    else if (size > TINY && size <= SMALL && head[1] == NULL)
+        return (SMALL);
+    else if (size > SMALL && head[2] == NULL)
+        return (LARGE);
     return -1;
 }
 
@@ -37,12 +63,19 @@ void    *search_memory(size_t size)
 
     if ((ret = head_is_empty(size)) != -1)
         if (ret <= SMALL)
-            result = mmap(NULL, ret * 100, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            //! TODO: really need to uncomment the * 100
+            result = push_back(ret/*  * 100 */, define_index(ret));
         else
-            result = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            result = push_back(size, define_index(ret));
     else
     {
+
         printf("Chunck of the size %d is not empty\n", ret);
+        // if (ret <= SMALL)
+        //     //! TODO: really need to uncomment the * 100
+        //     result = push_back(ret/*  * 100 */, define_index(ret));
+        // else
+        //     result = push_back(size, define_index(ret));
         //! search for a free block
     }
     return result;
@@ -57,7 +90,6 @@ void    *malloc(size_t size)
 
     if (size <= SMALL)
     {
-        write(1, "TINY or SMALL\n", strlen("TINY or SMALL\n"));
         result = search_memory(size);
         if (result == NULL)
         {
@@ -71,4 +103,26 @@ void    *malloc(size_t size)
         //! allocate directly memory for the good size
     }
     return result;
+}
+
+void    print_memory(int index)
+{
+    if (index < 0 || index > 3)
+    {
+        printf("Wrong index to print\n");
+    }
+    else
+    {
+        printf("PRINT MEMORY");
+        while (head[index] != NULL)
+        {
+            printf("\n-----------------\nIndex = %d\n\n", index);
+            printf("size = %zu\n", head[index]->size);
+            // printf(head[index]->head);
+            // printf(head[index]->next);
+            printf("free = %d\n", head[index]->free);
+            printf("addr = %p\n", head[index]);
+            head[index] = head[index]->next;
+        }
+    }
 }

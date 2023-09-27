@@ -34,13 +34,13 @@ typedef struct chunck_memory
     bool free;
 } chunck_memory;
 
-// Divided in 3 types of chuncks aka TINY, SMALL, LARGE
 // chunck_memory *head[3] = {NULL, NULL, NULL};
 
-void init();
-void split_memory(struct block_meta *block, size_t size);
+// void init();
+// void split_memory(struct block_meta *block, size_t size);
 void *malloc(size_t size);
-void merge_memory(size_t noOfBytes);
-void free(void *ptr);
+void    print_memory(int index);
+// void merge_memory(size_t noOfBytes);
+// void free(void *ptr);
 
 # endif
