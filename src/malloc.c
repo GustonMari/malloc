@@ -54,12 +54,6 @@ void    *malloc(size_t size)
 
     if (size <= 0)
         return result;
-    
-    // if (start == true)
-    // {
-    //     init_chunk_memory();
-    //     start = false;
-    // }
 
     if (size <= SMALL)
     {
