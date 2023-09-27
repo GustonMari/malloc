@@ -1,6 +1,7 @@
 # ifndef MEMORY_H
 # 	define MEMORY_H
-# include <stdlib.h>
+//! malloc is in stdlib.h
+// # include <stdlib.h>
 # include <stdio.h>
 # include <stdbool.h>
 # include <unistd.h>
@@ -9,6 +10,7 @@
 # include <sys/mman.h>
 # include <sys/time.h>
 # include <sys/resource.h>
+# include <errno.h>
 # define META_SIZE sizeof(block_meta)
 # define CHUNK_SIZE sizeof(chunck_memory)
 # define TINY 256
@@ -23,8 +25,6 @@ typedef struct block_meta
     bool free;
 } block_meta;
 
-// Divided in 3 types of chuncks aka TINY, SMALL, LARGE
-chunck_memory *head[3] = {NULL, NULL, NULL};
 // block_meta *head = (void *)memory;
 typedef struct chunck_memory
 {
@@ -33,6 +33,9 @@ typedef struct chunck_memory
     struct chunck_memory *next;
     bool free;
 } chunck_memory;
+
+// Divided in 3 types of chuncks aka TINY, SMALL, LARGE
+// chunck_memory *head[3] = {NULL, NULL, NULL};
 
 void init();
 void split_memory(struct block_meta *block, size_t size);
