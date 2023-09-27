@@ -1,116 +1,51 @@
 #include "../include/memory.h"
 
-void    init()
+// @return -1 if the head is not empty or return the good category of chunk size
+int   head_is_empty(size)
 {
-    // Initialize the head of the linked list
-    // head = sbrk(0);
-    head->size = 20000 - META_SIZE;
-    // head->size = 0;
-    head->next = NULL;
-    head->free = false;
+    if (head == NULL)
+    {
+        if (size <= TINY && head[0]->size != 0)
+            return (TINY);
+        else if (size > TINY && size <= SMALL && head[1]->size != 0)
+            return (SMALL);
+        else if (size > SMALL && head[2]->size != 0)
+            return (LARGE);
+    }
+    return -1;
 }
 
-// ? Making a way for a new block allocation by splitting a free block (assume first fit algorithm)
-void    split_memory(struct block_meta *block, size_t size)
+void    *search_memory(size_t size)
 {
-    // Split the memory into two blocks
-    block_meta *new_block = (void *)((void *)block + META_SIZE + size);
-    new_block->size = block->size - size - META_SIZE;
-    new_block->next = block->next;
-    new_block->free = true;
-    block->size = size;
-    block->next = new_block;
-    block->free = false;
+    int ret = -1;
+
+    if ((ret = head_is_empty(size)) != -1)
+        if (ret <= SMALL)
+            mmap(NULL, ret * 100, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        else
+            mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 }
 
 void    *malloc(size_t size)
 {
-    block_meta *prev, *current;
     void *result;
-    if (head->size == 0)
-        init();
-        write(1,"Initialize Memory\n",strlen("Initialize Memory\n"));
-    // ? First fit algorithm
-    current = head;
-    //check 
-    while (((current->size < size) || (current->free == false)) && (current->next != NULL))
+    if (size <= 0)
+        return NULL;
+    
+    if (size <= TINY)
     {
-        prev = current;
-        current = current->next;
-        write(1,"Check\n",strlen("Check\n"));
+        search_memory(size);
     }
-	// ! case 3
-    // if there is a memory chunk that fits perfectly the required size.
-    if ((current->size) == size)
+    else if (size > TINY && size <= SMALL)
     {
-        current->free = false;
-        result = (void *)(current + 1);
-        write(1, "Perfect size\n", strlen("Perfect size\n"));
-        return result;
-    }
-	// ! case 2
-    // if there is a memory chunk that fits the required size but it is bigger than the required size.
-    else if ((current->size) > (size + META_SIZE))
-    {
-        split_memory(current, size);
-        result = (void *)(current + 1);
-        write(1, "Split\n", strlen("Split\n"));
-        return result;
+        // search_memory(size);
+        //! search for memory but chunk will be different size (4096) ??
     }
     else
     {
-		// TODO need to make case 1 and 4
-        // There can be a situation where you have consecutive blocks that are set free by deallocating after they were previously allocated. 
-        // This results in external fragmentation which will cause the MyMalloc() function to return a NULL pointer although we have enough memory to allocate.
-        result = NULL;
-		// TODO: we need to go to the furthermost to the right of the heap, then create a new block that is right after the last block.
-        write(1, "No memory\n", strlen("No memory\n"));
-        return result;
+        write(1, "LARGE\n", 6);
+        //! allocate directly memory for the good size
     }
-}
-
-//? we use a function called merge() to join the consecutive free blocks by removing the metadata blocks lying in between.
-void    merge(struct block_meta *block)
-{
-    block_meta *current, *prev;
-    current = head;
-    while (current->next != NULL)
-    {
-        if ((current->free == true) && (current->next->free == true))
-        {
-            current->size += (current->next->size) + META_SIZE;
-            current->next = current->next->next;
-        }
-        prev = current;
-        current = current->next;
-    }
-}
-
-void    free(void *ptr)
-{
-    block_meta *current = ptr;
-    current--;
-    current->free = true;
-    merge(current);
 
 
-    // struct block_meta *current;
-    // if (((void *)head <= ptr) && (ptr <= (void *)(head + 1)))
-    // {
-    //     head->free = true;
-    //     merge(head);
-    //     return ;
-    // }
-    // current = head;
-    // while (current->next != NULL)
-    // {
-    //     if (((void *)current->next <= ptr) && (ptr <= (void *)(current->next + 1)))
-    //     {
-    //         current->next->free = true;
-    //         merge(current->next);
-    //         return ;
-    //     }
-    //     current = current->next;
-    // }
-    // return ;
 }

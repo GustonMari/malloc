@@ -11,10 +11,8 @@
 # include <sys/resource.h>
 # define META_SIZE sizeof(block_meta)
 # define CHUNK_SIZE sizeof(chunck_memory)
-# define TINY 256
-# define SMALL 4096
-# define LARGE 20000
-// char memory[20000];
+
+char memory[20000];
 
 typedef struct block_meta
 {
@@ -23,16 +21,9 @@ typedef struct block_meta
     bool free;
 } block_meta;
 
-// Divided in 3 types of chuncks aka TINY, SMALL, LARGE
-chunck_memory *head[3] = {NULL, NULL, NULL};
-// block_meta *head = (void *)memory;
-typedef struct chunck_memory
-{
-    size_t size;
-    block_meta *head;
-    struct chunck_memory *next;
-    bool free;
-} chunck_memory;
+
+block_meta *head = (void *)memory;
+
 
 void init();
 void split_memory(struct block_meta *block, size_t size);
