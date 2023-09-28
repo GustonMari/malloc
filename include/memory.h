@@ -11,6 +11,8 @@
 # include <sys/time.h>
 # include <sys/resource.h>
 # include <errno.h>
+# include <stdint.h>
+# include "color.h"
 # define META_SIZE sizeof(block_meta)
 # define CHUNK_SIZE sizeof(chunck_memory)
 # define TINY 256
@@ -40,6 +42,10 @@ typedef struct chunck_memory
 // void split_memory(struct block_meta *block, size_t size);
 void *malloc(size_t size);
 void    print_memory(int index);
+void	ft_putstr_fd(char *s, int fd);
+void	ft_putnbr_fd(int n, int fd);
+void printAddress(void *addr);
+
 // void merge_memory(size_t noOfBytes);
 // void free(void *ptr);
 
