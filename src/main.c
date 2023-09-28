@@ -14,10 +14,13 @@ int main(void)
 {
     char *str = malloc(50);
     char *str2 = malloc(50);
+    char *str3 = malloc(50);
     str = "Hello World";
-	print_info_string(str);
     str2 = "no mais allo quoi";
+	print_info_string(str);
 	print_info_string(str2);
+	print_info_string(str3);
+
     print_memory(0);
     // print_memory(1);
     // print_memory(2);

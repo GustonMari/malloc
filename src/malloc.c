@@ -31,12 +31,12 @@ void    *push_back(size_t size, int index)
 {
     chunck_memory *tmp = head[index];
     chunck_memory *new = NULL;
-
+	size_t new_size = 1;
     if (tmp == NULL)
     {
 		COLOR(BYEL, "Head is empty");
         head[index] = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-        head[index]->size = 0;
+        head[index]->size = 1;
         head[index]->head = NULL;
         head[index]->next = NULL;
         head[index]->free = true;
@@ -44,10 +44,13 @@ void    *push_back(size_t size, int index)
     }
     while (tmp->next != NULL)
     {
+		ft_putstr_fd("iterator\n", 1);
         tmp = tmp->next;
+		new_size += 1;
     }
+	ft_putstr_fd("push_back\n", 1);
     new = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    new->size = 0;
+    new->size = new_size + 1;
     new->head = NULL;
     new->next = NULL;
     new->free = true;
@@ -74,7 +77,7 @@ void    *search_memory(size_t size)
     void *result = NULL;
 
 	ret = define_size(size);
-	if (ret <= SMALL)
+	if (size <= SMALL)
 	{
 		//! TODO: really need to uncomment the * 100
 		result = push_back(ret/*  * 100 */, define_index(ret));
@@ -130,6 +133,7 @@ void    print_memory(int index)
 			ft_putstr_fd("\naddr = ", 1);
 			printAddress(head[index]);
 			ft_putstr_fd("\n", 1);
+			ft_putstr_fd((char *)head[index], 1);
             head[index] = head[index]->next;
         }
     }
