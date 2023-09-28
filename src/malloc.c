@@ -29,13 +29,12 @@ size_t	define_size(size_t size)
 
 void    *push_back(size_t size, int index)
 {
-	ft_putstr_fd("index =",1);
-	ft_putnbr_fd(index, 1);
     chunck_memory *tmp = head[index];
     chunck_memory *new = NULL;
 
     if (tmp == NULL)
     {
+		COLOR(BYEL, "Head is empty");
         head[index] = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         head[index]->size = 0;
         head[index]->head = NULL;
@@ -75,27 +74,13 @@ void    *search_memory(size_t size)
     void *result = NULL;
 
 	ret = define_size(size);
-    if ((head_is_empty(size)) != -1)
+	if (ret <= SMALL)
 	{
-		COLOR(BYEL, "Head is empty");
-        if (ret <= SMALL)
-		{
-            //! TODO: really need to uncomment the * 100
-            result = push_back(ret/*  * 100 */, define_index(ret));
-		}
-        else
-            result = push_back(size, define_index(ret));
+		//! TODO: really need to uncomment the * 100
+		result = push_back(ret/*  * 100 */, define_index(ret));
 	}
-    else
-    {
-		COLOR(BBLU, "Head is not empty");
-        // if (ret <= SMALL)
-        //     //! TODO: really need to uncomment the * 100
-        //     result = push_back(ret/*  * 100 */, define_index(ret));
-        // else
-        //     result = push_back(size, define_index(ret));
-        //! search for a free block
-    }
+	else
+		result = push_back(size, define_index(ret));
     return result;
 }
 
@@ -132,7 +117,7 @@ void    print_memory(int index)
     }
     else
     {
-        ft_putstr_fd("PRINT MEMORY\n", 1);
+        COLOR(BHGRN, "PRINT MEMORY\n");
 
         while (head[index] != NULL)
         {
