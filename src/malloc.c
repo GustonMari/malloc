@@ -65,7 +65,7 @@ int     head_is_empty(size_t size)
         return (SMALL);
     else if (size > SMALL && head[2] == NULL)
         return (LARGE);
-	COLOR(BRED, "Something is wrong in head_is_empty()");
+	// COLOR(BRED, "Something is wrong in head_is_empty()");
     return -1;
 }
 
@@ -74,20 +74,21 @@ void    *search_memory(size_t size)
     int ret = -1;
     void *result = NULL;
 
-    if ((ret = head_is_empty(size)) != -1)
+	ret = define_size(size);
+    if ((head_is_empty(size)) != -1)
+	{
+		COLOR(BYEL, "Head is empty");
         if (ret <= SMALL)
 		{
-
             //! TODO: really need to uncomment the * 100
-			ft_putstr_fd("ret = ", 1);
-			ft_putnbr_fd(ret, 1);
             result = push_back(ret/*  * 100 */, define_index(ret));
 		}
         else
             result = push_back(size, define_index(ret));
+	}
     else
     {
-		write(1, "Chunck of the size is not empty\n", strlen("Chunck of the size is not empty\n"));
+		COLOR(BBLU, "Head is not empty");
         // if (ret <= SMALL)
         //     //! TODO: really need to uncomment the * 100
         //     result = push_back(ret/*  * 100 */, define_index(ret));
@@ -111,6 +112,7 @@ void    *malloc(size_t size)
         if (result == NULL)
         {
             ft_putstr_fd("Need to push back into the actual chunck\n", 1);
+			result = push_back(size, define_index(size));
             return result;
         }
     }
