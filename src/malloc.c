@@ -27,28 +27,27 @@ size_t	define_size(size_t size)
 	return -1;
 }
 
-void    *push_back(size_t size, int index)
+void    *init_chunk(size_t index, size_t size)
 {
-    ft_putstr_fd("push_back\n", 1);
-    ft_putnbr_fd((int)size, 1);
+    head[index] = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    head[index]->size = 1;
+    head[index]->head = NULL;
+    head[index]->next = NULL;
+    head[index]->free = true;
+    return head[index];
+}
+
+void    *add_chunk(size_t index, size_t size)
+{
     chunck_memory *tmp = head[index];
     chunck_memory *new = NULL;
-	size_t new_size = 1;
-    if (tmp == NULL)
-    {
-		COLOR(BYEL, "Head is empty");
-        head[index] = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-        head[index]->size = 1;
-        head[index]->head = NULL;
-        head[index]->next = NULL;
-        head[index]->free = true;
-        return head[index];
-    }
+    size_t new_size = 1;
+
     while (tmp->next != NULL)
     {
         tmp = tmp->next;
         //! scan if there is space available
-		new_size += 1;
+        new_size += 1;
     }
     new = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     new->size = new_size + 1;
@@ -59,36 +58,22 @@ void    *push_back(size_t size, int index)
     return new;
 }
 
+void    *push_back(size_t size)
+{
+    size_t ret = -1;
+    size_t index = define_index(size);
+    ret = define_size(size);
 
-// void    *push_back(size_t size, int index)
-// {
-//     chunck_memory *tmp = head[index];
-//     chunck_memory *new = NULL;
-// 	size_t new_size = 1;
-//     if (tmp == NULL)
-//     {
-// 		COLOR(BYEL, "Head is empty");
-//         head[index] = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-//         head[index]->size = 1;
-//         head[index]->head = NULL;
-//         head[index]->next = NULL;
-//         head[index]->free = true;
-//         return head[index];
-//     }
-//     while (tmp->next != NULL)
-//     {
-//         tmp = tmp->next;
-// 		new_size += 1;
-//     }
-// 	ft_putstr_fd("push_back\n", 1);
-//     new = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-//     new->size = new_size + 1;
-//     new->head = NULL;
-//     new->next = NULL;
-//     new->free = true;
-//     tmp->next = new;
-//     return new;
-// }
+    if (size <= SMALL)
+        size = ret /* * 100 */;
+
+    if (head[index] == NULL)
+    {
+		COLOR(BYEL, "Head is empty");
+        return init_chunk(index, size);
+    }
+    return add_chunk(index, size);
+}
 
 // @return -1 if the head is not empty or return the good category of chunk size
 int     head_is_empty(size_t size)
@@ -105,18 +90,9 @@ int     head_is_empty(size_t size)
 
 void    *search_memory(size_t size)
 {
-    int ret = -1;
     void *result = NULL;
 
-	ret = define_size(size);
-	if (size <= SMALL)
-	{
-		//! TODO: really need to uncomment the * 100
-		// result = push_back(ret/*  * 100 */, define_index(ret));
-		result = push_back(ret/*  * 100 */, define_index(ret));
-	}
-	else
-		result = push_back(size, define_index(ret));
+    result = push_back(size);
     return result;
 }
 
@@ -128,15 +104,7 @@ void    *malloc(size_t size)
         return result;
 
     if (size <= SMALL)
-    {
         result = search_memory(size);
-        // if (result == NULL)
-        // {
-        //     ft_putstr_fd("Need to push back into the actual chunck\n", 1);
-		// 	result = push_back(size, define_index(size));
-        //     return result;
-        // }
-    }
     else
     {
 		ft_putstr_fd("LARGE\n", 1);
