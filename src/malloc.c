@@ -29,6 +29,8 @@ size_t	define_size(size_t size)
 
 void    *push_back(size_t size, int index)
 {
+    ft_putstr_fd("push_back\n", 1);
+    ft_putnbr_fd((int)size, 1);
     chunck_memory *tmp = head[index];
     chunck_memory *new = NULL;
 	size_t new_size = 1;
@@ -44,11 +46,10 @@ void    *push_back(size_t size, int index)
     }
     while (tmp->next != NULL)
     {
-		ft_putstr_fd("iterator\n", 1);
         tmp = tmp->next;
+        //! scan if there is space available
 		new_size += 1;
     }
-	ft_putstr_fd("push_back\n", 1);
     new = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     new->size = new_size + 1;
     new->head = NULL;
@@ -57,6 +58,37 @@ void    *push_back(size_t size, int index)
     tmp->next = new;
     return new;
 }
+
+
+// void    *push_back(size_t size, int index)
+// {
+//     chunck_memory *tmp = head[index];
+//     chunck_memory *new = NULL;
+// 	size_t new_size = 1;
+//     if (tmp == NULL)
+//     {
+// 		COLOR(BYEL, "Head is empty");
+//         head[index] = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+//         head[index]->size = 1;
+//         head[index]->head = NULL;
+//         head[index]->next = NULL;
+//         head[index]->free = true;
+//         return head[index];
+//     }
+//     while (tmp->next != NULL)
+//     {
+//         tmp = tmp->next;
+// 		new_size += 1;
+//     }
+// 	ft_putstr_fd("push_back\n", 1);
+//     new = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+//     new->size = new_size + 1;
+//     new->head = NULL;
+//     new->next = NULL;
+//     new->free = true;
+//     tmp->next = new;
+//     return new;
+// }
 
 // @return -1 if the head is not empty or return the good category of chunk size
 int     head_is_empty(size_t size)
@@ -80,6 +112,7 @@ void    *search_memory(size_t size)
 	if (size <= SMALL)
 	{
 		//! TODO: really need to uncomment the * 100
+		// result = push_back(ret/*  * 100 */, define_index(ret));
 		result = push_back(ret/*  * 100 */, define_index(ret));
 	}
 	else
@@ -97,12 +130,12 @@ void    *malloc(size_t size)
     if (size <= SMALL)
     {
         result = search_memory(size);
-        if (result == NULL)
-        {
-            ft_putstr_fd("Need to push back into the actual chunck\n", 1);
-			result = push_back(size, define_index(size));
-            return result;
-        }
+        // if (result == NULL)
+        // {
+        //     ft_putstr_fd("Need to push back into the actual chunck\n", 1);
+		// 	result = push_back(size, define_index(size));
+        //     return result;
+        // }
     }
     else
     {
@@ -125,6 +158,12 @@ void    print_memory(int index)
         while (head[index] != NULL)
         {
 			ft_putstr_fd("\n-----------------\nIndex = ", 1);
+            if (index == 0)
+                ft_putstr_fd("TINY", 1);
+            else if (index == 1)
+                ft_putstr_fd("SMALL", 1);
+            else if (index == 2)
+                ft_putstr_fd("LARGE", 1);
 			ft_putnbr_fd(index, 1);
 			ft_putstr_fd("\n\nsize = ", 1);
 			ft_putnbr_fd(head[index]->size, 1);
