@@ -58,6 +58,7 @@ void    *add_chunk(size_t index, size_t size)
     chunck_memory *tmp = head[index];
     chunck_memory *new = NULL;
     size_t new_size = 1;
+    size_t round_size = define_size(size);
 
     while (tmp->next != NULL)
     {
@@ -65,18 +66,86 @@ void    *add_chunk(size_t index, size_t size)
         //! scan if there is space available
         new_size += 1;
     }
-    new = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    new->size = new_size + 1;
-    new->meta = NULL;
+    new = mmap(NULL, round_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    new->size = round_size;
+    new->meta = (struct block_meta *)((char *)head[index] + sizeof(struct chunck_memory));
+    new->meta->size = size;
+    new->meta->next = NULL;
+    new->meta->free = true;
     new->next = NULL;
     new->free = true;
     tmp->next = new;
     return new;
 }
+void    *search_memory(size_t size)
+{
+    void *result = NULL;
 
+    result = push_back(size);
+    return result;
+}
+
+// void    *search_memory(size_t size)
+// {
+//     void *result = NULL;
+
+//     result = push_back(size);
+//     return result;
+// }
+
+void    *search_free_space(size_t index, size_t size)
+{
+    chunck_memory *tmp = head[index];
+    void *result = NULL;
+    size_t occuped_size = 0;
+
+    while (tmp != NULL)
+    {
+        //! if chunk is free and size is enough
+        if (tmp->free == true && tmp->size >= size)
+        {
+            //! check if meta is free and size is enough
+            if (tmp->meta->free == true && tmp->meta->size >= size)
+            {
+                while (tmp->meta->next != NULL)
+                {
+                    if (tmp->meta->free == true)
+                    {
+                        occuped_size += tmp->meta->size;
+
+                        // result = tmp->meta;
+                        // break ;
+                    }
+                    tmp->meta = tmp->meta->next;
+                }
+                if (occuped_size + sizeof(struct block_meta) + size <= tmp->size)
+                {
+                    COLOR(BHGRN, "THERE IS SPACE\n");
+                    // result = tmp->meta;
+                    // break ;
+                }
+                else
+                {
+                    COLOR(BHRED, "THERE IS NO SPACE\n");
+                    // result = search_memory(size);
+                    // break ;
+                }
+            }
+            result = tmp;
+            break ;
+        }
+        tmp = tmp->next;
+    }
+    return result;
+}
 
 void    *add(size_t index, size_t size)
 {
+    void *result = NULL;
+    
+    result = add_chunk(index, size);
+
+    return result;
     // ADD new chunck (add_chunk) or search for space in a chunck that have already space in it
 }
 
@@ -96,7 +165,7 @@ void    *push_back(size_t size)
         ft_putnbr_fd(round_size, 1);
         return init_chunk(index, round_size, size);
     }
-    return add_chunk(index, size);
+    return add(index, size);
 }
 
 // @return -1 if the head is not empty or return the good category of chunk size
@@ -112,13 +181,7 @@ int     head_is_empty(size_t size)
     return -1;
 }
 
-void    *search_memory(size_t size)
-{
-    void *result = NULL;
 
-    result = push_back(size);
-    return result;
-}
 
 void    *malloc(size_t size)
 {
@@ -128,7 +191,7 @@ void    *malloc(size_t size)
         return result;
 
     if (size <= SMALL)
-        result = search_memory(size);
+        result = push_back(size);
     else
     {
 		ft_putstr_fd("LARGE\n", 1);
