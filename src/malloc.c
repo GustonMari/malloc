@@ -15,18 +15,24 @@ int     define_index(size_t size)
     return -1;
 }
 
-void split_memory(struct block_meta *block, size_t size)
+//TODO: need to check this funciton
+void    *split_memory(chunck_memory *memory, size_t size)
 {
-    struct block_meta *new = NULL;
+    chunck_memory *new = NULL;
 
     //! take the current addr of the block and add the size of the block_meta
-    new = (void *)((char *)block + META_SIZE + size);
+    new = (void *)((char *)memory + CHUNK_SIZE + size);
     COLOR(BHGRN, "SPLIT MEMORY\n");
-    new->size = block->size - size - META_SIZE;
-    new->next = block->next;
+    new->size = memory->size - size - CHUNK_SIZE;
+    new->meta = (struct block_meta *)((char *)new + sizeof(struct chunck_memory));
+    new->meta->size = new->size;
+    new->meta->next = NULL;
+    new->meta->free = true;
+    new->next = memory->next;
     new->free = true;
-    block->size = size;
-    block->next = new;
+    memory->size = size;
+    memory->next = new;
+    return new;
 }
 
 
@@ -82,7 +88,7 @@ void    *add_chunk(size_t index, size_t size)
 void    *search_free_space(size_t index, size_t size)
 {
     chunck_memory *tmp = head[index];
-    void *result = NULL;
+    // void *result = NULL;
     size_t occuped_size = 0;
 
     while (tmp != NULL)
@@ -96,15 +102,16 @@ void    *search_free_space(size_t index, size_t size)
                 while (tmp->meta->next != NULL)
                 {
                     if (tmp->meta->free == true)
-                    {
                         occuped_size += tmp->meta->size;
-                        // result = tmp->meta;
-                        // break ;
-                    }
                     tmp->meta = tmp->meta->next;
                 }
                 if (occuped_size + sizeof(struct block_meta) + size <= tmp->size)
+                {
                     COLOR(BHGRN, "THERE IS SPACE\n");
+                    //! add new meta
+                    // split_memory(tmp->meta, size);
+                    return tmp;
+                }
                 else
                     COLOR(BHRED, "THERE IS NO SPACE\n");
                 ft_putnbr_fd(occuped_size, 1);
@@ -117,12 +124,10 @@ void    *search_free_space(size_t index, size_t size)
                 ft_putstr_fd("\n", 1);
        
             }
-            result = tmp;
-            break ;
         }
         tmp = tmp->next;
     }
-    return result;
+    return tmp;
 }
 
 void    *add(size_t index, size_t size)
