@@ -15,6 +15,21 @@ int     define_index(size_t size)
     return -1;
 }
 
+void split_memory(struct block_meta *block, size_t size)
+{
+    struct block_meta *new = NULL;
+
+    //! take the current addr of the block and add the size of the block_meta
+    new = (void *)((char *)block + META_SIZE + size);
+    COLOR(BHGRN, "SPLIT MEMORY\n");
+    new->size = block->size - size - META_SIZE;
+    new->next = block->next;
+    new->free = true;
+    block->size = size;
+    block->next = new;
+}
+
+
 size_t	define_size(size_t size)
 {
 	if (size <= TINY)
@@ -27,13 +42,14 @@ size_t	define_size(size_t size)
 	return -1;
 }
 
-void    *init_chunk(size_t index, size_t size)
+void    *init_chunk(size_t index, size_t round_size, size_t size)
 {
-    head[index] = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    head[index] = mmap(NULL, round_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     head[index]->size = 1;
-    head[index]->head = NULL;
+    head[index]->meta = NULL;
     head[index]->next = NULL;
     head[index]->free = true;
+    init_meta(head[index], size);
     return head[index];
 }
 
@@ -51,26 +67,34 @@ void    *add_chunk(size_t index, size_t size)
     }
     new = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     new->size = new_size + 1;
-    new->head = NULL;
+    new->meta = NULL;
     new->next = NULL;
     new->free = true;
     tmp->next = new;
     return new;
 }
 
+
+void    *add(size_t index, size_t size)
+{
+    // ADD new chunck (add_chunk) or search for space in a chunck that have already space in it
+}
+
 void    *push_back(size_t size)
 {
-    size_t ret = -1;
+    size_t round_size = -1;
     size_t index = define_index(size);
-    ret = define_size(size);
+    round_size = define_size(size);
 
     if (size <= SMALL)
-        size = ret /* * 100 */;
+        size = round_size /* * 100 */;
 
     if (head[index] == NULL)
     {
 		COLOR(BYEL, "Head is empty");
-        return init_chunk(index, size);
+        ft_putnbr_fd(size, 1);
+        ft_putnbr_fd(round_size, 1);
+        return init_chunk(index, round_size, size);
     }
     return add_chunk(index, size);
 }

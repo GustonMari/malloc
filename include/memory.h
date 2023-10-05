@@ -31,7 +31,7 @@ typedef struct block_meta
 typedef struct chunck_memory
 {
     size_t size;
-    block_meta *head;
+    block_meta *meta;
     struct chunck_memory *next;
     bool free;
 } chunck_memory;
@@ -45,6 +45,10 @@ void    print_memory(int index);
 void	ft_putstr_fd(char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
 void printAddress(void *addr);
+
+//? =================== META ===================
+
+void    init_meta(chunck_memory *memory, size_t size);
 
 // void merge_memory(size_t noOfBytes);
 // void free(void *ptr);
