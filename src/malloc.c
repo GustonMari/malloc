@@ -42,10 +42,11 @@ size_t	define_size(size_t size)
 	return -1;
 }
 
-void    *init_chunk(size_t index, size_t round_size, size_t size)
+void    *init_chunk(size_t index, size_t size)
 {
+    size_t round_size = define_size(size);
     head[index] = mmap(NULL, round_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    head[index]->size = 1;
+    head[index]->size = round_size;
     head[index]->meta = NULL;
     head[index]->next = NULL;
     head[index]->free = true;
@@ -77,21 +78,6 @@ void    *add_chunk(size_t index, size_t size)
     tmp->next = new;
     return new;
 }
-void    *search_memory(size_t size)
-{
-    void *result = NULL;
-
-    result = push_back(size);
-    return result;
-}
-
-// void    *search_memory(size_t size)
-// {
-//     void *result = NULL;
-
-//     result = push_back(size);
-//     return result;
-// }
 
 void    *search_free_space(size_t index, size_t size)
 {
@@ -112,24 +98,24 @@ void    *search_free_space(size_t index, size_t size)
                     if (tmp->meta->free == true)
                     {
                         occuped_size += tmp->meta->size;
-
                         // result = tmp->meta;
                         // break ;
                     }
                     tmp->meta = tmp->meta->next;
                 }
                 if (occuped_size + sizeof(struct block_meta) + size <= tmp->size)
-                {
                     COLOR(BHGRN, "THERE IS SPACE\n");
-                    // result = tmp->meta;
-                    // break ;
-                }
                 else
-                {
                     COLOR(BHRED, "THERE IS NO SPACE\n");
-                    // result = search_memory(size);
-                    // break ;
-                }
+                ft_putnbr_fd(occuped_size, 1);
+                ft_putstr_fd("\nstruct", 1);
+                ft_putnbr_fd(sizeof(struct block_meta), 1);
+                ft_putstr_fd("\nsize =", 1);
+                ft_putnbr_fd(size, 1);
+                ft_putstr_fd("\ntmp-.size =", 1);
+                ft_putnbr_fd(tmp->size, 1);
+                ft_putstr_fd("\n", 1);
+       
             }
             result = tmp;
             break ;
@@ -143,27 +129,20 @@ void    *add(size_t index, size_t size)
 {
     void *result = NULL;
     
+    search_free_space(index, size);
     result = add_chunk(index, size);
-
     return result;
     // ADD new chunck (add_chunk) or search for space in a chunck that have already space in it
 }
 
 void    *push_back(size_t size)
 {
-    size_t round_size = -1;
     size_t index = define_index(size);
-    round_size = define_size(size);
-
-    if (size <= SMALL)
-        size = round_size /* * 100 */;
 
     if (head[index] == NULL)
     {
 		COLOR(BYEL, "Head is empty");
-        ft_putnbr_fd(size, 1);
-        ft_putnbr_fd(round_size, 1);
-        return init_chunk(index, round_size, size);
+        return init_chunk(index, size);
     }
     return add(index, size);
 }
